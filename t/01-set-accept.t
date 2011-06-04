@@ -2,7 +2,8 @@ use strict;
 use warnings;
 
 use HTTP::Request::Common;
-use Test::More tests => 26;
+use Test::Exception;
+use Test::More tests => 34;
 use Test::XML;
 use Plack::Builder;
 use Plack::Test;
@@ -85,9 +86,56 @@ test_psgi $app, sub {
     is $res->content, 'application/xml, application/json';
 };
 
-# try bad from
-# try no param when from is param
+throws_ok {
+    builder {
+        enable 'SetAccept';
+    };
+} qr/'from' parameter is required/;
+
+throws_ok {
+    builder {
+        enable 'SetAccept', from => 'suffix';
+    };
+} qr/'mapping' parameter is required/;
+
+throws_ok {
+    builder {
+        enable 'SetAccept', from => 'frob', mapping => {};
+    };
+} qr/'frob' is not a valid value for the 'from' parameter/;
+
+throws_ok {
+    builder {
+        enable 'SetAccept', from => 'suffix', mapping => [];
+    };
+} qr/'mapping' parameter must be a hash reference/;
+
+throws_ok {
+    builder {
+        enable 'SetAccept', from => 'suffix', mapping => sub {};
+    };
+} qr/'mapping' parameter must be a hash reference/;
+
+lives_ok {
+    builder {
+        enable 'SetAccept', from => ['suffix', 'param'], param => 'format', mapping => {};
+    };
+};
+
+throws_ok {
+    builder {
+        enable 'SetAccept', from => 'param', mapping => {};
+    };
+} qr/'param' parameter is required when using 'param' for from/;
+
+throws_ok {
+    builder {
+        enable 'SetAccept', from => ['suffix', 'param'], mapping => {};
+    };
+} qr/'param' parameter is required when using 'param' for from/;
+
 # try both froms at once
 # handle GET/POST
 # See how all PSGI env vars are affected (eg. those regarding path, body)
-# should we even do the 406 stuff?
+# accept order
+# what to do when ACCEPT is */*, and they ask for .json?

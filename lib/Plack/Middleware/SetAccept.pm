@@ -6,6 +6,34 @@ use strict;
 use warnings;
 use parent 'Plack::Middleware';
 
+use Carp;
+
+sub prepare_app {
+    my ( $self ) = @_;
+
+    my ( $from, $mapping, $param ) = @{$self}{qw/from mapping param/};
+
+    unless($from) {
+        croak "'from' parameter is required";
+    }
+    unless($mapping) {
+        croak "'mapping' parameter is required";
+    }
+    $from  = [ $from ] unless ref($from);
+    if(grep { $_ ne 'suffix' && $_ ne 'param' } @$from) {
+        croak "'$from->[0]' is not a valid value for the 'from' parameter";
+    }
+    if(grep { $_ eq 'param' } @$from) {
+        unless($param) {
+            croak "'param' parameter is required when using 'param' for from";
+        }
+    }
+
+    unless(ref($mapping) eq 'HASH') {
+        croak "'mapping' parameter must be a hash reference";
+    }
+}
+
 sub extract_format {
     my ( $self, $env ) = @_;
 

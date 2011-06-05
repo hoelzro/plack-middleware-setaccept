@@ -3,7 +3,7 @@ use warnings;
 
 use HTTP::Request::Common;
 use Test::Exception;
-use Test::More tests => 34;
+use Test::More tests => 60;
 use Test::XML;
 use Plack::Builder;
 use Plack::Test;
@@ -82,6 +82,69 @@ test_psgi $app, sub {
     is_xml $res->content, '<ul><li><a href="http://localhost:9000/bar.json">application/json</a></li><li><a href="http://localhost:9000/bar.xml">application/xml</a></li></ul>';
 
     $res = $cb->(GET 'http://localhost:5000/foo.json', Accept => 'application/xml');
+    is $res->code, 200;
+    is $res->content, 'application/xml, application/json';
+};
+
+$app = builder {
+    enable 'SetAccept', from => 'param', param => 'format', mapping => \%map;
+    $inner_app;
+};
+
+test_psgi $app, sub {
+    my ( $cb ) = @_;
+
+    my $res;
+
+    $res = $cb->(GET '/foo');
+    is $res->code, 200;
+    is $res->content, '*/*';
+
+    $res = $cb->(GET '/foo.json');
+    is $res->code, 200;
+    is $res->content, '*/*';
+
+    $res = $cb->(GET '/foo.xml');
+    is $res->code, 200;
+    is $res->content, '*/*';
+
+    $res = $cb->(GET '/foo?format=json');
+    is $res->code, 200;
+    is $res->content, 'application/json';
+
+    $res = $cb->(GET '/foo?format=xml');
+    is $res->code, 200;
+    is $res->content, 'application/xml';
+
+    $res = $cb->(GET '/foo.yaml');
+    is $res->code, 200;
+    is $res->content, '*/*';
+
+    $res = $cb->(GET 'http://localhost:5000/foo?format=yaml');
+    is $res->code, 406;
+    is_xml $res->content, '<ul><li><a href="http://localhost:5000/foo?format=json">application/json</a></li><li><a href="http://localhost:5000/foo?format=xml">application/xml</a></li></ul>';
+
+    $res = $cb->(GET 'http://localhost:9000/bar?format=yaml');
+    is $res->code, 406;
+    is_xml $res->content, '<ul><li><a href="http://localhost:9000/bar?format=json">application/json</a></li><li><a href="http://localhost:9000/bar?format=xml">application/xml</a></li></ul>';
+
+    $res = $cb->(GET '/foo', Accept => 'application/json');
+    is $res->code, 200;
+    is $res->content, 'application/json';
+
+    $res = $cb->(GET '/foo', Accept => 'application/xml');
+    is $res->code, 200;
+    is $res->content, 'application/xml';
+
+    $res = $cb->(GET 'http://localhost:5000/foo', Accept => 'application/x-yaml');
+    is $res->code, 406;
+    is_xml $res->content, '<ul><li><a href="http://localhost:5000/foo?format=json">application/json</a></li><li><a href="http://localhost:5000/foo?format=xml">application/xml</a></li></ul>';
+
+    $res = $cb->(GET 'http://localhost:9000/bar', Accept => 'application/x-yaml');
+    is $res->code, 406;
+    is_xml $res->content, '<ul><li><a href="http://localhost:9000/bar?format=json">application/json</a></li><li><a href="http://localhost:9000/bar?format=xml">application/xml</a></li></ul>';
+
+    $res = $cb->(GET 'http://localhost:5000/foo?format=json', Accept => 'application/xml');
     is $res->code, 200;
     is $res->content, 'application/xml, application/json';
 };

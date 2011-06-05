@@ -7,6 +7,8 @@ use warnings;
 use parent 'Plack::Middleware';
 
 use Carp;
+use URI;
+use URI::QueryParam;
 
 sub prepare_app {
     my ( $self ) = @_;
@@ -34,6 +36,24 @@ sub prepare_app {
     }
 }
 
+sub get_uri {
+    my ( $self, $env ) = @_;
+
+    my $host;
+    unless($host = $env->{'HTTP_HOST'}) {
+        $host = $env->{'SERVER_NAME'};
+        unless($env->{'SERVER_PORT'} == 80) {
+            $host .= ':' . $env->{'SERVER_PORT'};
+        }
+    }
+
+    return URI->new(
+        $env->{'psgi.url_scheme'} . '://' .
+        $host .
+        $env->{'REQUEST_URI'}
+    );
+}
+
 sub extract_format {
     my ( $self, $env ) = @_;
 
@@ -52,9 +72,9 @@ sub extract_format {
                 $env->{'PATH_INFO'} = $`;
             }
         } elsif($_ eq 'param') {
-            ...
-        } else {
-            ...
+            my $uri  = $self->get_uri($env);
+            $format  = $uri->query_param($self->{'param'});
+            ## remove query param
         }
     }
     return $format;
@@ -79,9 +99,20 @@ sub unacceptable {
     my $path = $env->{'PATH_INFO'};
 
     my $links = '<ul>';
-    foreach my $format (sort keys %{$self->{'mapping'}}) {
-        my $type = $self->{'mapping'}{$format};
-        $links .= "<li><a href='http://$host$path.$format'>$type</a></li>";
+    my $from  = $self->{'from'};
+
+    if($from eq 'suffix') {
+        foreach my $format (sort keys %{$self->{'mapping'}}) {
+            my $type = $self->{'mapping'}{$format};
+            $links .= "<li><a href='http://$host$path.$format'>$type</a></li>";
+        }
+    } elsif($from eq 'param') {
+        my $param = $self->{'param'};
+
+        foreach my $format (sort keys %{$self->{'mapping'}}) {
+            my $type = $self->{'mapping'}{$format};
+            $links .= "<li><a href='http://$host$path?$param=$format'>$type</a></li>";
+        }
     }
     $links .= '</ul>';
     return [

@@ -117,7 +117,7 @@ sub unacceptable {
     $links .= '</ul>';
     return [
         406,
-        ['Content-Type' => 'text/html'],
+        ['Content-Type' => 'application/xhtml+xml'],
         [$links],
     ];
 }

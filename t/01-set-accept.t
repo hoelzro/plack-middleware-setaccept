@@ -55,12 +55,12 @@ test_psgi $app, sub {
 
     $res = $cb->(GET 'http://localhost:5000/foo.yaml');
     is $res->code, 406;
-    is $res->content_type, 'text/html';
+    is $res->content_type, 'application/xhtml+xml';
     is_xml $res->content, '<ul><li><a href="http://localhost:5000/foo.json">application/json</a></li><li><a href="http://localhost:5000/foo.xml">application/xml</a></li></ul>';
 
     $res = $cb->(GET 'http://localhost:9000/bar.yaml');
     is $res->code, 406;
-    is $res->content_type, 'text/html';
+    is $res->content_type, 'application/xhtml+xml';
     is_xml $res->content, '<ul><li><a href="http://localhost:9000/bar.json">application/json</a></li><li><a href="http://localhost:9000/bar.xml">application/xml</a></li></ul>';
 
     $res = $cb->(GET '/foo?format=yaml');
@@ -77,12 +77,12 @@ test_psgi $app, sub {
 
     $res = $cb->(GET 'http://localhost:5000/foo', Accept => 'application/x-yaml');
     is $res->code, 406;
-    is $res->content_type, 'text/html';
+    is $res->content_type, 'application/xhtml+xml';
     is_xml $res->content, '<ul><li><a href="http://localhost:5000/foo.json">application/json</a></li><li><a href="http://localhost:5000/foo.xml">application/xml</a></li></ul>';
 
     $res = $cb->(GET 'http://localhost:9000/bar', Accept => 'application/x-yaml');
     is $res->code, 406;
-    is $res->content_type, 'text/html';
+    is $res->content_type, 'application/xhtml+xml';
     is_xml $res->content, '<ul><li><a href="http://localhost:9000/bar.json">application/json</a></li><li><a href="http://localhost:9000/bar.xml">application/xml</a></li></ul>';
 
     $res = $cb->(GET 'http://localhost:5000/foo.json', Accept => 'application/xml');
@@ -126,12 +126,12 @@ test_psgi $app, sub {
 
     $res = $cb->(GET 'http://localhost:5000/foo?format=yaml');
     is $res->code, 406;
-    is $res->content_type, 'text/html';
+    is $res->content_type, 'application/xhtml+xml';
     is_xml $res->content, '<ul><li><a href="http://localhost:5000/foo?format=json">application/json</a></li><li><a href="http://localhost:5000/foo?format=xml">application/xml</a></li></ul>';
 
     $res = $cb->(GET 'http://localhost:9000/bar?format=yaml');
     is $res->code, 406;
-    is $res->content_type, 'text/html';
+    is $res->content_type, 'application/xhtml+xml';
     is_xml $res->content, '<ul><li><a href="http://localhost:9000/bar?format=json">application/json</a></li><li><a href="http://localhost:9000/bar?format=xml">application/xml</a></li></ul>';
 
     $res = $cb->(GET '/foo', Accept => 'application/json');
@@ -144,12 +144,12 @@ test_psgi $app, sub {
 
     $res = $cb->(GET 'http://localhost:5000/foo', Accept => 'application/x-yaml');
     is $res->code, 406;
-    is $res->content_type, 'text/html';
+    is $res->content_type, 'application/xhtml+xml';
     is_xml $res->content, '<ul><li><a href="http://localhost:5000/foo?format=json">application/json</a></li><li><a href="http://localhost:5000/foo?format=xml">application/xml</a></li></ul>';
 
     $res = $cb->(GET 'http://localhost:9000/bar', Accept => 'application/x-yaml');
     is $res->code, 406;
-    is $res->content_type, 'text/html';
+    is $res->content_type, 'application/xhtml+xml';
     is_xml $res->content, '<ul><li><a href="http://localhost:9000/bar?format=json">application/json</a></li><li><a href="http://localhost:9000/bar?format=xml">application/xml</a></li></ul>';
 
     $res = $cb->(GET 'http://localhost:5000/foo?format=json', Accept => 'application/xml');

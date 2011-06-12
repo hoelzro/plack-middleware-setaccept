@@ -442,7 +442,7 @@ test_psgi $app, sub {
     is $query_string, 'foo=bar';
 
     $res = $cb->(GET '/foo?foo=bar&format=json');
-    ( $script_name, $path_info, $request_uri, $query_string ) =
+    ( $path_info, $request_uri, $query_string ) =
         @{ eval $res->content };
 
     is $path_info, '/foo';
@@ -450,38 +450,34 @@ test_psgi $app, sub {
     is $query_string, 'foo=bar';
 
     $res = $cb->(GET '/foo?foo=bar&format=json');
-    ( $script_name, $path_info, $request_uri, $query_string ) =
+    ( $path_info, $request_uri, $query_string ) =
         @{ eval $res->content };
 
-    is $script_name, '/foo';
     is $path_info, '/foo';
     is $request_uri, '/foo?foo=bar';
     is $query_string, 'foo=bar';
 
     $res = $cb->(GET '/foo.xml?foo=bar&format=json');
-    ( $script_name, $path_info, $request_uri, $query_string ) =
+    ( $path_info, $request_uri, $query_string ) =
         @{ eval $res->content };
 
-    is $script_name, '/foo';
     is $path_info, '/foo';
     is $request_uri, '/foo?foo=bar';
     is $query_string, 'foo=bar';
 
     $res = $cb->(GET '/foo.bar.json');
-    ( $script_name, $path_info, $request_uri, $query_string, $accept ) =
+    ( $path_info, $request_uri, $query_string, $accept ) =
         @{ eval $res->content };
 
-    is $script_name, '/foo.bar';
     is $path_info, '/foo.bar';
     is $request_uri, '/foo.bar';
     is $query_string, 'foo=bar';
     is $accept, 'application/json';
 
     $res = $cb->(GET '/foo?format=json&foo=bar&format=xml');
-    ( $script_name, $path_info, $request_uri, $query_string, $accept ) =
+    ( $path_info, $request_uri, $query_string, $accept ) =
         @{ eval $res->content };
 
-    is $script_name, '/foo';
     is $path_info, '/foo';
     is $request_uri, '/foo?foo=bar';
     is $query_string, 'foo=bar';

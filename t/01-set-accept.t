@@ -327,7 +327,7 @@ $app = builder {
             200,
             ['Content-Type' => 'text/plain'],
             [Dumper([
-                @{$env}{qw/SCRIPT_NAME PATH_INFO REQUEST_URI QUERY_STRING HTTP_ACCEPT/}
+                @{$env}{qw/PATH_INFO REQUEST_URI QUERY_STRING HTTP_ACCEPT/}
             ])],
         ];
     };
@@ -336,22 +336,20 @@ $app = builder {
 test_psgi $app, sub {
     my ( $cb ) = @_;
 
-    my ( $script_name, $path_info, $request_uri, $query_string, $accept );
+    my ( $path_info, $request_uri, $query_string, $accept );
 
     $res = $cb->(GET '/');
-    ( $script_name, $path_info, $request_uri, $query_string ) =
+    ( $path_info, $request_uri, $query_string ) =
         @{ eval $res->content };
 
-    is $script_name, '';
     is $path_info, '/';
     is $request_uri, '/';
     is $query_string, '';
 
     $res = $cb->(GET '/foo.json?foo=bar');
-    ( $script_name, $path_info, $request_uri, $query_string ) =
+    ( $path_info, $request_uri, $query_string ) =
         @{ eval $res->content };
 
-    is $script_name, '/foo';
     is $path_info, '/foo';
     is $request_uri, '/foo?foo=bar';
     is $query_string, 'foo=bar';

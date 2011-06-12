@@ -67,7 +67,7 @@ sub extract_format {
 
         if($_ eq 'suffix') {
             my $path = $env->{'PATH_INFO'};
-            if($path =~ /\.(.+)$/) {
+            if($path =~ /\.([^.]+)$/) {
                 $format = $1;
                 $env->{'PATH_INFO'} = $`;
             }

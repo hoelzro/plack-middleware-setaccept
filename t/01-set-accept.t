@@ -239,10 +239,10 @@ test_psgi $app, sub {
     is $res->code, 200;
     is $res->content, 'application/xml';
 
-    $res = $cb->(GET '/foo.yaml');
+    $res = $cb->(GET 'http://localhost:5000/foo.yaml');
     is $res->code, 406;
     is $res->content_type, 'application/xhtml+xml';
-    is $res->content, '<ul><li><a href="http://localhost:5000/foo.json">application/json</a></li><li><a href="http://localhost:5000/foo.xml">application/xml</a></li></ul>';
+    is_xml $res->content, '<ul><li><a href="http://localhost:5000/foo.json">application/json</a></li><li><a href="http://localhost:5000/foo.xml">application/xml</a></li></ul>';
 
     $res = $cb->(GET 'http://localhost:5000/foo?format=yaml');
     is $res->code, 406;
@@ -353,7 +353,15 @@ test_psgi $app, sub {
 
     is $script_name, '/foo';
     is $path_info, '/foo';
-    is $request_uri, '/foo';
+    is $request_uri, '/foo?foo=bar';
+    is $query_string, 'foo=bar';
+
+    $res = $cb->(GET '/foo?foo=bar&format=json');
+    ( $script_name, $path_info, $request_uri, $query_string ) =
+        @{ eval $res->content };
+
+    is $path_info, '/foo';
+    is $request_uri, '/foo?foo=bar';
     is $query_string, 'foo=bar';
 
     $res = $cb->(GET '/foo?foo=bar&format=json');
@@ -362,16 +370,7 @@ test_psgi $app, sub {
 
     is $script_name, '/foo';
     is $path_info, '/foo';
-    is $request_uri, '/foo';
-    is $query_string, 'foo=bar';
-
-    $res = $cb->(GET '/foo?foo=bar&format=json');
-    ( $script_name, $path_info, $request_uri, $query_string ) =
-        @{ eval $res->content };
-
-    is $script_name, '/foo';
-    is $path_info, '/foo';
-    is $request_uri, '/foo';
+    is $request_uri, '/foo?foo=bar';
     is $query_string, 'foo=bar';
 
     $res = $cb->(GET '/foo.xml?foo=bar&format=json');
@@ -380,7 +379,7 @@ test_psgi $app, sub {
 
     is $script_name, '/foo';
     is $path_info, '/foo';
-    is $request_uri, '/foo';
+    is $request_uri, '/foo?foo=bar';
     is $query_string, 'foo=bar';
 
     $res = $cb->(GET '/foo.bar.json');
@@ -399,7 +398,7 @@ test_psgi $app, sub {
 
     is $script_name, '/foo';
     is $path_info, '/foo';
-    is $request_uri, '/foo';
+    is $request_uri, '/foo?foo=bar';
     is $query_string, 'foo=bar';
     is $accept, 'application/json, application/xml';
 };

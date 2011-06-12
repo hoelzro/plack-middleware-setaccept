@@ -60,27 +60,38 @@ sub get_uri {
 sub extract_format {
     my ( $self, $env ) = @_;
 
-    my $format;
+    my @format;
     my $from = $self->{'from'};
 
     $from = [ $from ] unless ref $from;
 
-    foreach (@$from) {
-        last if defined $format;
+    my @reasons;
 
+    my $uri = $self->get_uri($env);
+    foreach (@$from) {
         if($_ eq 'suffix') {
-            my $path = $env->{'PATH_INFO'};
+            my $path = $uri->path;
+
             if($path =~ /\.([^.]+)$/) {
-                $format = $1;
-                $env->{'PATH_INFO'} = $`;
+                push @format, $1;
+                $path = $`;
+                $uri->path($path);
+                push @reasons, 'suffix';
             }
         } elsif($_ eq 'param') {
-            my $uri  = $self->get_uri($env);
-            $format  = $uri->query_param($self->{'param'});
-            ## remove query param
+            my @values = $uri->query_param_delete($self->{'param'});
+            if(@values) {
+                push @format, @values;
+                push @reasons, 'param';
+            }
         }
     }
-    return $format;
+    if(@reasons) { # if there has been any modification
+        $env->{'PATH_INFO'}    = $uri->path;
+        $env->{'REQUEST_URI'}  = $uri->path_query;
+        $env->{'QUERY_STRING'} = $uri->query;
+    }
+    return ( \@format, \@reasons );
 }
 
 sub acceptable {
@@ -90,7 +101,7 @@ sub acceptable {
 }
 
 sub unacceptable {
-    my ( $self, $env ) = @_;
+    my ( $self, $env, $reasons ) = @_;
 
     my $host;
     unless($host = $env->{'HTTP_HOST'}) {
@@ -102,7 +113,15 @@ sub unacceptable {
     my $path = $env->{'PATH_INFO'};
 
     my $links = '<ul>';
-    my $from  = $self->{'from'};
+
+    my $from;
+
+    if(@$reasons) {
+        $from = $reasons->[0];
+    } else {
+        $from = $self->{'from'};
+        $from = $from->[0] if ref $from;
+    }
 
     if($from eq 'suffix') {
         foreach my $format (sort keys %{$self->{'mapping'}}) {
@@ -128,25 +147,43 @@ sub unacceptable {
 sub call {
     my ( $self, $env ) = @_;
 
-    my $format = $self->extract_format($env);
+    if($env->{'REQUEST_METHOD'} eq 'GET') {
+        my ( $format, $reasons ) = $self->extract_format($env);
 
-    if(defined $format) {
-        my $mapping = $self->{'mapping'}{$format};
-        if(defined $mapping) {
-            my @accept = split /\s*,\s*/, $env->{'HTTP_ACCEPT'} || '';
-            push @accept, $mapping;
-            $env->{'HTTP_ACCEPT'} = join(', ', @accept);
-        } else {
-            return $self->unacceptable($env);
-        }
-    } else {
-        if(exists $env->{'HTTP_ACCEPT'}) {
-            my $accept = $env->{'HTTP_ACCEPT'};
-            unless($self->acceptable($accept)) {
-                return $self->unacceptable($env);
+        if(@$format) {
+            foreach my $f (@$format) {
+                unless(exists $self->{'mapping'}{$f}) {
+                    return $self->unacceptable($env, $reasons);
+                }
             }
+            my @accept = split /\s*,\s*/, $env->{'HTTP_ACCEPT'} || '';
+            foreach my $f (@$format) {
+                my $mapping = $self->{'mapping'}{$f};
+                my ( $mapping_type ) = split /\//, $mapping;
+                foreach my $accept (@accept) {
+                    if($accept eq $mapping) {
+                        undef $mapping;
+                        last;
+                    }
+                    next unless defined($accept) && $accept =~ /\*/;
+                    my ( $type ) = split /\//, $accept;
+
+                    if($type eq '*' || $type eq $mapping_type) {
+                        undef $accept;
+                    }
+                }
+                push @accept, $mapping if defined $mapping;
+            }
+            $env->{'HTTP_ACCEPT'} = join(', ', grep { defined } @accept);
         } else {
-            $env->{'HTTP_ACCEPT'} = '*/*'
+            if(exists $env->{'HTTP_ACCEPT'}) {
+                my $accept = $env->{'HTTP_ACCEPT'};
+                unless($self->acceptable($accept)) {
+                    return $self->unacceptable($env, $reasons);
+                }
+            } else {
+                $env->{'HTTP_ACCEPT'} = '*/*'
+            }
         }
     }
     return $self->app->($env);

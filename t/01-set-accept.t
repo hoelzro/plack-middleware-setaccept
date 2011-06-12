@@ -4,7 +4,7 @@ use warnings;
 use Data::Dumper;
 use HTTP::Request::Common;
 use Test::Exception;
-use Test::More tests => 146;
+use Test::More tests => 179;
 use Test::XML;
 use Plack::Builder;
 use Plack::Test;

@@ -213,7 +213,7 @@ throws_ok {
     builder {
         enable 'SetAccept', from => [], mapping => {};
     };
-} qr/'from' paramater cannot be an empty array reference/;
+} qr/'from' parameter cannot be an empty array reference/;
 
 $app = builder {
     enable 'SetAccept', from => ['suffix', 'param'], param => 'format', mapping => \%map;

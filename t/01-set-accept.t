@@ -471,12 +471,12 @@ test_psgi $app, sub {
     is $request_uri, '/foo?foo=bar';
     is $query_string, 'foo=bar';
 
-    $res = $cb->(GET '/foo.bar.json');
+    $res = $cb->(GET '/foo.bar.json?foo=bar');
     ( $path_info, $request_uri, $query_string, $accept ) =
         @{ eval $res->content };
 
     is $path_info, '/foo.bar';
-    is $request_uri, '/foo.bar';
+    is $request_uri, '/foo.bar?foo=bar';
     is $query_string, 'foo=bar';
     is $accept, 'application/json';
 

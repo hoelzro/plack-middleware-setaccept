@@ -21,7 +21,10 @@ sub prepare_app {
     unless($mapping) {
         croak "'mapping' parameter is required";
     }
-    $from  = [ $from ] unless ref($from);
+    $from = [ $from ] unless ref($from);
+    unless(@$from) {
+        croak "'from' parameter cannot be an empty array reference";
+    }
     if(grep { $_ ne 'suffix' && $_ ne 'param' } @$from) {
         croak "'$from->[0]' is not a valid value for the 'from' parameter";
     }

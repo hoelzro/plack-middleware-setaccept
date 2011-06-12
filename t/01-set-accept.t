@@ -215,6 +215,12 @@ throws_ok {
     };
 } qr/'from' parameter cannot be an empty array reference/;
 
+throws_ok {
+    builder {
+        enable 'SetAccept', from => ['suffix', 'frob'], mapping => {};
+    };
+} qr/'frob' is not a valid value for the 'from' parameter/;
+
 $app = builder {
     enable 'SetAccept', from => ['suffix', 'param'], param => 'format', mapping => \%map;
     $inner_app;

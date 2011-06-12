@@ -296,12 +296,93 @@ test_psgi $app, sub {
     is $res->content, 'application/xml, application/json';
 };
 
+$app = builder {
+    enable 'SetAccept', from => ['param', 'suffix'], param => 'format', mapping => \%map;
+    $inner_app;
+};
+
+test_psgi $app, sub {
+    my ( $cb ) = @_;
+
+    my $res;
+
+    $res = $cb->(GET '/foo');
+    is $res->code, 200;
+    is $res->content, '*/*';
+
+    $res = $cb->(GET '/foo.json');
+    is $res->code, 200;
+    is $res->content, 'application/json';
+
+    $res = $cb->(GET '/foo.xml');
+    is $res->code, 200;
+    is $res->content, 'application/xml';
+
+    $res = $cb->(GET '/foo?format=json');
+    is $res->code, 200;
+    is $res->content, 'application/json';
+
+    $res = $cb->(GET '/foo?format=xml');
+    is $res->code, 200;
+    is $res->content, 'application/xml';
+
+    $res = $cb->(GET 'http://localhost:5000/foo.yaml');
+    is $res->code, 406;
+    is $res->content_type, 'application/xhtml+xml';
+    is_xml $res->content, '<ul><li><a href="http://localhost:5000/foo.json">application/json</a></li><li><a href="http://localhost:5000/foo.xml">application/xml</a></li></ul>';
+
+    $res = $cb->(GET 'http://localhost:5000/foo?format=yaml');
+    is $res->code, 406;
+    is $res->content_type, 'application/xhtml+xml';
+    is_xml $res->content, '<ul><li><a href="http://localhost:5000/foo?format=json">application/json</a></li><li><a href="http://localhost:5000/foo?format=xml">application/xml</a></li></ul>';
+
+    $res = $cb->(GET 'http://localhost:9000/bar.yaml');
+    is $res->code, 406;
+    is $res->content_type, 'application/xhtml+xml';
+    is_xml $res->content, '<ul><li><a href="http://localhost:9000/bar.json">application/json</a></li><li><a href="http://localhost:9000/bar.xml">application/xml</a></li></ul>';
+
+    $res = $cb->(GET 'http://localhost:9000/bar?format=yaml');
+    is $res->code, 406;
+    is $res->content_type, 'application/xhtml+xml';
+    is_xml $res->content, '<ul><li><a href="http://localhost:9000/bar?format=json">application/json</a></li><li><a href="http://localhost:9000/bar?format=xml">application/xml</a></li></ul>';
+
+    $res = $cb->(GET '/foo', Accept => 'application/json');
+    is $res->code, 200;
+    is $res->content, 'application/json';
+
+    $res = $cb->(GET '/foo', Accept => 'application/xml');
+    is $res->code, 200;
+    is $res->content, 'application/xml';
+
+    $res = $cb->(GET 'http://localhost:5000/foo', Accept => 'application/x-yaml');
+    is $res->code, 406;
+    is $res->content_type, 'application/xhtml+xml';
+    is_xml $res->content, '<ul><li><a href="http://localhost:5000/foo?format=json">application/json</a></li><li><a href="http://localhost:5000/foo?format=xml">application/xml</a></li></ul>';
+
+    $res = $cb->(GET 'http://localhost:9000/bar', Accept => 'application/x-yaml');
+    is $res->code, 406;
+    is $res->content_type, 'application/xhtml+xml';
+    is_xml $res->content, '<ul><li><a href="http://localhost:9000/bar?format=json">application/json</a></li><li><a href="http://localhost:9000/bar?format=xml">application/xml</a></li></ul>';
+
+    $res = $cb->(GET 'http://localhost:5000/foo?format=json', Accept => 'application/xml');
+    is $res->code, 200;
+    is $res->content, 'application/xml, application/json';
+
+    $res = $cb->(GET 'http://localhost:5000/foo.json', Accept => 'application/xml');
+    is $res->code, 200;
+    is $res->content, 'application/xml, application/json';
+
+    $res = $cb->(GET 'http://localhost:5000/foo.json?format=json', Accept => 'application/xml');
+    is $res->code, 200;
+    is $res->content, 'application/xml, application/json';
+};
+
 test_psgi $app, sub {
     my ( $cb ) = @_;
 
     $res = $cb->(POST '/foo.json');
     is $res->code, 200;
-    is $res->content, '*/*';
+    is $res->content, 'undef';
 
     $res = $cb->(POST '/foo.json', Accept => 'application/xml');
     is $res->code, 200;

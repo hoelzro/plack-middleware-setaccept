@@ -25,8 +25,8 @@ sub prepare_app {
     unless(@$from) {
         croak "'from' parameter cannot be an empty array reference";
     }
-    if(grep { $_ ne 'suffix' && $_ ne 'param' } @$from) {
-        croak "'$from->[0]' is not a valid value for the 'from' parameter";
+    if(my ( $bad ) = grep { $_ ne 'suffix' && $_ ne 'param' } @$from) {
+        croak "'$bad' is not a valid value for the 'from' parameter";
     }
     if(grep { $_ eq 'param' } @$from) {
         unless($param) {

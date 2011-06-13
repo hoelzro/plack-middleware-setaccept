@@ -4,7 +4,7 @@ use warnings;
 use Data::Dumper;
 use HTTP::Request::Common;
 use Test::Exception;
-use Test::More tests => 179;
+use Test::More tests => 196;
 use Test::XML;
 use Plack::Builder;
 use Plack::Test;
@@ -488,4 +488,46 @@ test_psgi $app, sub {
     is $request_uri, '/foo?foo=bar';
     is $query_string, 'foo=bar';
     is $accept, 'application/json, application/xml';
+
+    $res = $cb->(GET '/foo.json', Accept => 'application/json');
+    ( $path_info, $request_uri, undef, $accept ) =
+        @{ eval $res->content };
+
+    is $path_info, '/foo';
+    is $request_uri, '/foo';
+    is $accept, 'application/json';
+
+    $res = $cb->(GET '/foo.yaml?format=json', Accept => 'application/json');
+    is $res->code, 200;
+    ( $path_info, $request_uri, undef, $accept ) =
+        @{ eval $res->content };
+
+    is $path_info, '/foo';
+    is $request_uri, '/foo';
+    is $accept, 'application/json';
+
+    $res = $cb->(GET '/foo bar.json?value=I like spaces!', Accept => 'application/json');
+    ( $path_info, $request_uri, $query_string, $accept ) =
+        @{ eval $res->content };
+
+    is $path_info, '/foo%20bar';
+    is $request_uri, '/foo%20bar?value=I%20like%20spaces!';
+    is $query_string, 'value=I%20like%20spaces!';
+    is $accept, 'application/json';
+
+    $res = $cb->(GET '/foo.json', Accept => 'text/plain, application/xml');
+    ( $path_info, $request_uri, undef, $accept ) =
+        @{ eval $res->content };
+
+    is $path_info, '/foo';
+    is $request_uri, '/foo';
+    is $accept, 'text/plain, application/xml, application/json';
+
+    $res = $cb->(GET '/foo.yaml', Accept => 'application/xml');
+    ( $path_info, $request_uri, undef, $accept ) =
+        @{ eval $res->content };
+
+    is $path_info, '/foo';
+    is $request_uri, '/foo';
+    is $accept, 'application/xml';
 };

@@ -4,7 +4,7 @@ use warnings;
 use Data::Dumper;
 use HTTP::Request::Common;
 use Test::Exception;
-use Test::More tests => 209;
+use Test::More tests => 217;
 use Test::XML;
 use Plack::Builder;
 use Plack::Test;
@@ -565,3 +565,51 @@ test_psgi $app, sub {
     is $request_uri, '/foo';
     is $accept, 'application/json; q=0.8, application/xml';
 };
+
+$app = builder {
+    enable 'SetAccept', from => ['suffix'], mapping => {
+        json => 'application/json; q=0.2',
+    };
+
+    sub {
+        my ( $env ) = @_;
+
+        return [
+            200,
+            ['Content-Type' => 'text/plain'],
+            [Dumper([
+                @{$env}{qw/PATH_INFO REQUEST_URI QUERY_STRING HTTP_ACCEPT/}
+            ])],
+        ];
+    };
+};
+
+test_psgi $app, sub {
+    my ( $cb ) = @_;
+
+    my ( $path_info, $request_uri, $query_string, $accept );
+
+    $res = $cb->(GET '/foo.json');
+    is $res->code, 200;
+    ( undef, undef, undef, $accept ) =
+        @{ eval $res->content };
+    is $accept, 'application/json; q=0.2';
+
+    $res = $cb->(GET '/foo.json', Accept => 'application/json; q=0.2');
+    is $res->code, 200;
+    ( undef, undef, undef, $accept ) =
+        @{ eval $res->content };
+    is $accept, 'application/json; q=0.2';
+
+    $res = $cb->(GET '/foo.json', Accept => 'application/json');
+    is $res->code, 200;
+    ( undef, undef, undef, $accept ) =
+        @{ eval $res->content };
+    is $accept, 'application/json; q=0.2';
+
+    $res = $cb->(GET '/foo.json', Accept => 'application/json; q=0.3');
+    is $res->code, 200;
+    ( undef, undef, undef, $accept ) =
+        @{ eval $res->content };
+    is $accept, 'application/json; q=0.2';
+}

@@ -4,7 +4,7 @@ use warnings;
 use Data::Dumper;
 use HTTP::Request::Common;
 use Test::Exception;
-use Test::More tests => 196;
+use Test::More tests => 209;
 use Test::XML;
 use Plack::Builder;
 use Plack::Test;
@@ -530,4 +530,38 @@ test_psgi $app, sub {
     is $path_info, '/foo';
     is $request_uri, '/foo';
     is $accept, 'application/xml';
+
+    $res = $cb->(GET '/foo', Accept => 'text/plain, application/xml');
+    ( $path_info, $request_uri, undef, $accept ) =
+        @{ eval $res->content };
+
+    is $path_info, '/foo';
+    is $request_uri, '/foo';
+    is $accept, 'text/plain, application/xml';
+
+    $res = $cb->(GET '/foo', Accept => 'text/plain, application/xml; q=0.1');
+    ( $path_info, $request_uri, undef, $accept ) =
+        @{ eval $res->content };
+
+    is $path_info, '/foo';
+    is $request_uri, '/foo';
+    is $accept, 'text/plain, application/xml; q=0.1';
+
+    $res = $cb->(GET '/foo', Accept => 'text/plain, application/x-yaml');
+    is $res->code, 406;
+    $res = $cb->(GET '/foo', Accept => 'application/json; q=0.8');
+    ( $path_info, $request_uri, undef, $accept ) =
+        @{ eval $res->content };
+
+    is $path_info, '/foo';
+    is $request_uri, '/foo';
+    is $accept, 'application/json; q=0.8';
+
+    $res = $cb->(GET '/foo.xml', Accept => 'application/json; q=0.8');
+    ( $path_info, $request_uri, undef, $accept ) =
+        @{ eval $res->content };
+
+    is $path_info, '/foo';
+    is $request_uri, '/foo';
+    is $accept, 'application/json; q=0.8, application/xml';
 };

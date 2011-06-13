@@ -97,8 +97,9 @@ sub extract_format {
 
 sub acceptable {
     my ( $self, $accept ) = @_;
-    ## simple, stupid implementation
-    return grep { $_ eq $accept } values %{ $self->{'mapping'} };
+
+    my %acceptable = map { s/;.*$//; $_ => 1 } split /\s*,\s*/, $accept;
+    return grep { $acceptable{$_} } values %{ $self->{'mapping'} };
 }
 
 sub unacceptable {
@@ -152,13 +153,14 @@ sub call {
         my ( $format, $reasons ) = $self->extract_format($env);
 
         if(@$format) {
-            if(any { exists $self->{'mapping'}{$_} } @$format) {
+            my $accept = $env->{'HTTP_ACCEPT'} || '';
+            if((any { exists $self->{'mapping'}{$_} } @$format) || $self->acceptable($accept)) {
                 @$format = grep { exists $self->{'mapping'}{$_} } @$format;
             } else {
                 return $self->unacceptable($env, $reasons);
             }
 
-            my @accept = split /\s*,\s*/, $env->{'HTTP_ACCEPT'} || '';
+            my @accept = split /\s*,\s*/, $accept;
             foreach my $f (@$format) {
                 my $mapping = $self->{'mapping'}{$f};
                 my ( $mapping_type ) = split /\//, $mapping;

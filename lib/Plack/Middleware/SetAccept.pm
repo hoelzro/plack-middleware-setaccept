@@ -163,10 +163,14 @@ sub call {
             my @accept = split /\s*,\s*/, $accept;
             foreach my $f (@$format) {
                 my $mapping = $self->{'mapping'}{$f};
+                my $mapping_noparams = $mapping;
+                $mapping_noparams =~ s/;.*$//;
                 my ( $mapping_type ) = split /\//, $mapping;
                 foreach my $accept (@accept) {
-                    if($accept eq $mapping) {
-                        undef $mapping;
+                    my $accept_noparams = $accept;
+                    $accept_noparams =~ s/;.*$//;
+                    if($accept_noparams eq $mapping_noparams) {
+                        undef $accept;
                         last;
                     }
                     next unless defined($accept) && $accept =~ /\*/;

@@ -7,6 +7,7 @@ use warnings;
 use parent 'Plack::Middleware';
 
 use Carp;
+use List::MoreUtils qw(any);
 use URI;
 use URI::QueryParam;
 
@@ -151,11 +152,12 @@ sub call {
         my ( $format, $reasons ) = $self->extract_format($env);
 
         if(@$format) {
-            foreach my $f (@$format) {
-                unless(exists $self->{'mapping'}{$f}) {
-                    return $self->unacceptable($env, $reasons);
-                }
+            if(any { exists $self->{'mapping'}{$_} } @$format) {
+                @$format = grep { exists $self->{'mapping'}{$_} } @$format;
+            } else {
+                return $self->unacceptable($env, $reasons);
             }
+
             my @accept = split /\s*,\s*/, $env->{'HTTP_ACCEPT'} || '';
             foreach my $f (@$format) {
                 my $mapping = $self->{'mapping'}{$f};

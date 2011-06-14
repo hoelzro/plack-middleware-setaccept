@@ -114,42 +114,47 @@ sub unacceptable {
     }
     my $path = $env->{'PATH_INFO'};
 
-    my $links = '<ul>';
+    my $content;
 
-    my $from;
+    if($env->{'REQUEST_METHOD'} eq 'GET') {
+        $content = '<ul>';
 
-    if(@$reasons) {
-        $from = $reasons->[0];
-    } else {
-        $from = $self->{'from'};
-        $from = $from->[0] if ref $from;
-    }
+        my $from;
 
-    if($from eq 'suffix') {
-        foreach my $format (sort keys %{$self->{'mapping'}}) {
-            my $type = $self->{'mapping'}{$format};
-            $links .= "<li><a href='http://$host$path.$format'>$type</a></li>";
+        if(@$reasons) {
+            $from = $reasons->[0];
+        } else {
+            $from = $self->{'from'};
+            $from = $from->[0] if ref $from;
         }
-    } elsif($from eq 'param') {
-        my $param = $self->{'param'};
 
-        foreach my $format (sort keys %{$self->{'mapping'}}) {
-            my $type = $self->{'mapping'}{$format};
-            $links .= "<li><a href='http://$host$path?$param=$format'>$type</a></li>";
+        if($from eq 'suffix') {
+            foreach my $format (sort keys %{$self->{'mapping'}}) {
+                my $type = $self->{'mapping'}{$format};
+                $content .= "<li><a href='http://$host$path.$format'>$type</a></li>";
+            }
+        } elsif($from eq 'param') {
+            my $param = $self->{'param'};
+
+            foreach my $format (sort keys %{$self->{'mapping'}}) {
+                my $type = $self->{'mapping'}{$format};
+                $content .= "<li><a href='http://$host$path?$param=$format'>$type</a></li>";
+            }
         }
+        $content .= '</ul>';
     }
-    $links .= '</ul>';
     return [
         406,
         ['Content-Type' => 'application/xhtml+xml'],
-        [$links],
+        [$content],
     ];
 }
 
 sub call {
     my ( $self, $env ) = @_;
 
-    if($env->{'REQUEST_METHOD'} eq 'GET') {
+    my $method = $env->{'REQUEST_METHOD'};
+    if($method eq 'GET' || $method eq 'HEAD') {
         my ( $format, $reasons ) = $self->extract_format($env);
 
         if(@$format) {

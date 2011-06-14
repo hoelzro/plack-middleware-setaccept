@@ -19,7 +19,7 @@ sub REQUEST {
 }
 
 my @methods         = qw/HEAD GET/;
-my @tolerant_values = (0, 1);
+my @tolerant_values = (undef, 0, 1);
 
 plan tests => 213 * @methods * @tolerant_values + 4;
 
@@ -41,7 +41,7 @@ foreach my $tolerant (@tolerant_values) {
         );
 
         my $app = builder {
-            enable 'SetAccept', from => 'suffix', mapping => \%map, tolerant => $tolerant;
+            enable 'SetAccept', from => 'suffix', mapping => \%map, (defined $tolerant ? (tolerant => $tolerant) : ());
             $inner_app;
         };
 
@@ -71,7 +71,7 @@ foreach my $tolerant (@tolerant_values) {
             is $res->content, '*/*';
 
             $res = $cb->(REQUEST $method => 'http://localhost:5000/foo.yaml');
-            if($tolerant) {
+            if(!defined($tolerant) || $tolerant) {
                 is $res->code, 200;
                 pass;
                 is $res->content, 'undef';
@@ -86,7 +86,7 @@ foreach my $tolerant (@tolerant_values) {
             }
 
             $res = $cb->(REQUEST $method => 'http://localhost:9000/bar.yaml');
-            if($tolerant) {
+            if(!defined($tolerant) || $tolerant) {
                 is $res->code, 200;
                 pass;
                 is $res->content, 'undef';
@@ -113,7 +113,7 @@ foreach my $tolerant (@tolerant_values) {
             is $res->content, 'application/xml';
 
             $res = $cb->(REQUEST $method => 'http://localhost:5000/foo', Accept => 'application/x-yaml');
-            if($tolerant) {
+            if(!defined($tolerant) || $tolerant) {
                 is $res->code, 200;
                 pass;
                 is $res->content, 'application/x-yaml';
@@ -128,7 +128,7 @@ foreach my $tolerant (@tolerant_values) {
             }
 
             $res = $cb->(REQUEST $method => 'http://localhost:9000/bar', Accept => 'application/x-yaml');
-            if($tolerant) {
+            if(!defined($tolerant) || $tolerant) {
                 is $res->code, 200;
                 pass;
                 is $res->content, 'application/x-yaml';
@@ -148,7 +148,7 @@ foreach my $tolerant (@tolerant_values) {
         };
 
         $app = builder {
-            enable 'SetAccept', from => 'param', param => 'format', mapping => \%map, tolerant => $tolerant;
+            enable 'SetAccept', from => 'param', param => 'format', mapping => \%map, (defined $tolerant ? (tolerant => $tolerant) : ());
             $inner_app;
         };
 
@@ -182,7 +182,7 @@ foreach my $tolerant (@tolerant_values) {
             is $res->content, '*/*';
 
             $res = $cb->(REQUEST $method => 'http://localhost:5000/foo?format=yaml');
-            if($tolerant) {
+            if(!defined($tolerant) || $tolerant) {
                 is $res->code, 200;
                 pass;
                 is $res->content, 'undef';
@@ -197,7 +197,7 @@ foreach my $tolerant (@tolerant_values) {
             }
 
             $res = $cb->(REQUEST $method => 'http://localhost:9000/bar?format=yaml');
-            if($tolerant) {
+            if(!defined($tolerant) || $tolerant) {
                 is $res->code, 200;
                 pass;
                 is $res->content, 'undef';
@@ -220,7 +220,7 @@ foreach my $tolerant (@tolerant_values) {
             is $res->content, 'application/xml';
 
             $res = $cb->(REQUEST $method => 'http://localhost:5000/foo', Accept => 'application/x-yaml');
-            if($tolerant) {
+            if(!defined($tolerant) || $tolerant) {
                 is $res->code, 200;
                 pass;
                 is $res->content, 'application/x-yaml';
@@ -235,7 +235,7 @@ foreach my $tolerant (@tolerant_values) {
             }
 
             $res = $cb->(REQUEST $method => 'http://localhost:9000/bar', Accept => 'application/x-yaml');
-            if($tolerant) {
+            if(!defined($tolerant) || $tolerant) {
                 is $res->code, 200;
                 pass;
                 is $res->content, 'application/x-yaml';
@@ -315,7 +315,7 @@ foreach my $tolerant (@tolerant_values) {
         } qr/'frob' is not a valid value for the 'from' parameter/;
 
         $app = builder {
-            enable 'SetAccept', from => ['suffix', 'param'], param => 'format', mapping => \%map, tolerant => $tolerant;
+            enable 'SetAccept', from => ['suffix', 'param'], param => 'format', mapping => \%map, (defined $tolerant ? (tolerant => $tolerant) : ());
             $inner_app;
         };
 
@@ -345,7 +345,7 @@ foreach my $tolerant (@tolerant_values) {
             is $res->content, 'application/xml';
 
             $res = $cb->(REQUEST $method => 'http://localhost:5000/foo.yaml');
-            if($tolerant) {
+            if(!defined($tolerant) || $tolerant) {
                 is $res->code, 200;
                 pass;
                 is $res->content, 'undef';
@@ -360,7 +360,7 @@ foreach my $tolerant (@tolerant_values) {
             }
 
             $res = $cb->(REQUEST $method => 'http://localhost:5000/foo?format=yaml');
-            if($tolerant) {
+            if(!defined($tolerant) || $tolerant) {
                 is $res->code, 200;
                 pass;
                 is $res->content, 'undef';
@@ -375,7 +375,7 @@ foreach my $tolerant (@tolerant_values) {
             }
 
             $res = $cb->(REQUEST $method => 'http://localhost:9000/bar.yaml');
-            if($tolerant) {
+            if(!defined($tolerant) || $tolerant) {
                 is $res->code, 200;
                 pass;
                 is $res->content, 'undef';
@@ -390,7 +390,7 @@ foreach my $tolerant (@tolerant_values) {
             }
 
             $res = $cb->(REQUEST $method => 'http://localhost:9000/bar?format=yaml');
-            if($tolerant) {
+            if(!defined($tolerant) || $tolerant) {
                 is $res->code, 200;
                 pass;
                 is $res->content, 'undef';
@@ -413,7 +413,7 @@ foreach my $tolerant (@tolerant_values) {
             is $res->content, 'application/xml';
 
             $res = $cb->(REQUEST $method => 'http://localhost:5000/foo', Accept => 'application/x-yaml');
-            if($tolerant) {
+            if(!defined($tolerant) || $tolerant) {
                 is $res->code, 200;
                 pass;
                 is $res->content, 'application/x-yaml';
@@ -428,7 +428,7 @@ foreach my $tolerant (@tolerant_values) {
             }
 
             $res = $cb->(REQUEST $method => 'http://localhost:9000/bar', Accept => 'application/x-yaml');
-            if($tolerant) {
+            if(!defined($tolerant) || $tolerant) {
                 is $res->code, 200;
                 pass;
                 is $res->content, 'application/x-yaml';
@@ -456,7 +456,7 @@ foreach my $tolerant (@tolerant_values) {
         };
 
         $app = builder {
-            enable 'SetAccept', from => ['param', 'suffix'], param => 'format', mapping => \%map, tolerant => $tolerant;
+            enable 'SetAccept', from => ['param', 'suffix'], param => 'format', mapping => \%map, (defined $tolerant ? (tolerant => $tolerant) : ());
             $inner_app;
         };
 
@@ -486,7 +486,7 @@ foreach my $tolerant (@tolerant_values) {
             is $res->content, 'application/xml';
 
             $res = $cb->(REQUEST $method => 'http://localhost:5000/foo.yaml');
-            if($tolerant) {
+            if(!defined($tolerant) || $tolerant) {
                 is $res->code, 200;
                 pass;
                 is $res->content, 'undef';
@@ -501,7 +501,7 @@ foreach my $tolerant (@tolerant_values) {
             }
 
             $res = $cb->(REQUEST $method => 'http://localhost:5000/foo?format=yaml');
-            if($tolerant) {
+            if(!defined($tolerant) || $tolerant) {
                 is $res->code, 200;
                 pass;
                 is $res->content, 'undef';
@@ -516,7 +516,7 @@ foreach my $tolerant (@tolerant_values) {
             }
 
             $res = $cb->(REQUEST $method => 'http://localhost:9000/bar.yaml');
-            if($tolerant) {
+            if(!defined($tolerant) || $tolerant) {
                 is $res->code, 200;
                 pass;
                 is $res->content, 'undef';
@@ -531,7 +531,7 @@ foreach my $tolerant (@tolerant_values) {
             }
 
             $res = $cb->(REQUEST $method => 'http://localhost:9000/bar?format=yaml');
-            if($tolerant) {
+            if(!defined($tolerant) || $tolerant) {
                 is $res->code, 200;
                 pass;
                 is $res->content, 'undef';
@@ -554,7 +554,7 @@ foreach my $tolerant (@tolerant_values) {
             is $res->content, 'application/xml';
 
             $res = $cb->(REQUEST $method => 'http://localhost:5000/foo', Accept => 'application/x-yaml');
-            if($tolerant) {
+            if(!defined($tolerant) || $tolerant) {
                 is $res->code, 200;
                 pass;
                 is $res->content, 'application/x-yaml';
@@ -569,7 +569,7 @@ foreach my $tolerant (@tolerant_values) {
             }
 
             $res = $cb->(REQUEST $method => 'http://localhost:9000/bar', Accept => 'application/x-yaml');
-            if($tolerant) {
+            if(!defined($tolerant) || $tolerant) {
                 is $res->code, 200;
                 pass;
                 is $res->content, 'application/x-yaml';
@@ -613,7 +613,7 @@ foreach my $tolerant (@tolerant_values) {
         };
 
         $app = builder {
-            enable 'SetAccept', from => ['suffix', 'param'], param => 'format', mapping => \%map, tolerant => $tolerant;
+            enable 'SetAccept', from => ['suffix', 'param'], param => 'format', mapping => \%map, (defined $tolerant ? (tolerant => $tolerant) : ());
             sub {
                 my ( $env ) = @_;
 
@@ -749,7 +749,7 @@ foreach my $tolerant (@tolerant_values) {
             is $accept, 'text/plain, application/xml; q=0.1';
 
             $res = $cb->(REQUEST $method => '/foo', Accept => 'text/plain, application/x-yaml');
-            if($tolerant) {
+            if(!defined($tolerant) || $tolerant) {
                 is $res->code, 200;
                 pass;
             } else {
@@ -775,7 +775,7 @@ foreach my $tolerant (@tolerant_values) {
         $app = builder {
             enable 'SetAccept', from => ['suffix'], mapping => {
                 json => 'application/json; q=0.2',
-            }, tolerant => $tolerant;
+            }, (defined $tolerant ? (tolerant => $tolerant) : ());
 
             sub {
                 my ( $env ) = @_;

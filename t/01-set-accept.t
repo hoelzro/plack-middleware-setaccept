@@ -79,7 +79,7 @@ foreach my $tolerant (@tolerant_values) {
                 is $res->code, 406;
                 is $res->content_type, 'application/xhtml+xml';
                 if($method eq 'GET') {
-                    is_xml $res->content, '<ul><li><a href="http://localhost:5000/foo.json">application/json</a></li><li><a href="http://localhost:5000/foo.xml">application/xml</a></li></ul>';
+                    is_xml $res->content, '<html xmlns="http://www.w3.org/1999/xhtml"><body><ul><li><a href="http://localhost:5000/foo.json">application/json</a></li><li><a href="http://localhost:5000/foo.xml">application/xml</a></li></ul></body></html>';
                 } else {
                     is $res->content, '';
                 }
@@ -94,7 +94,7 @@ foreach my $tolerant (@tolerant_values) {
                 is $res->code, 406;
                 is $res->content_type, 'application/xhtml+xml';
                 if($method eq 'GET') {
-                    is_xml $res->content, '<ul><li><a href="http://localhost:9000/bar.json">application/json</a></li><li><a href="http://localhost:9000/bar.xml">application/xml</a></li></ul>';
+                    is_xml $res->content, '<html xmlns="http://www.w3.org/1999/xhtml"><body><ul><li><a href="http://localhost:9000/bar.json">application/json</a></li><li><a href="http://localhost:9000/bar.xml">application/xml</a></li></ul></body></html>';
                 } else {
                     is $res->content, '';
                 }
@@ -121,7 +121,7 @@ foreach my $tolerant (@tolerant_values) {
                 is $res->code, 406;
                 is $res->content_type, 'application/xhtml+xml';
                 if($method eq 'GET') {
-                    is_xml $res->content, '<ul><li><a href="http://localhost:5000/foo.json">application/json</a></li><li><a href="http://localhost:5000/foo.xml">application/xml</a></li></ul>';
+                    is_xml $res->content, '<html xmlns="http://www.w3.org/1999/xhtml"><body><ul><li><a href="http://localhost:5000/foo.json">application/json</a></li><li><a href="http://localhost:5000/foo.xml">application/xml</a></li></ul></body></html>';
                 } else {
                     is $res->content, '';
                 }
@@ -136,7 +136,7 @@ foreach my $tolerant (@tolerant_values) {
                 is $res->code, 406;
                 is $res->content_type, 'application/xhtml+xml';
                 if($method eq 'GET') {
-                    is_xml $res->content, '<ul><li><a href="http://localhost:9000/bar.json">application/json</a></li><li><a href="http://localhost:9000/bar.xml">application/xml</a></li></ul>';
+                    is_xml $res->content, '<html xmlns="http://www.w3.org/1999/xhtml"><body><ul><li><a href="http://localhost:9000/bar.json">application/json</a></li><li><a href="http://localhost:9000/bar.xml">application/xml</a></li></ul></body></html>';
                 } else  {
                     is $res->content, '';
                 }
@@ -190,7 +190,7 @@ foreach my $tolerant (@tolerant_values) {
                 is $res->code, 406;
                 is $res->content_type, 'application/xhtml+xml';
                 if($method eq 'GET') {
-                    is_xml $res->content, '<ul><li><a href="http://localhost:5000/foo?format=json">application/json</a></li><li><a href="http://localhost:5000/foo?format=xml">application/xml</a></li></ul>';
+                    is_xml $res->content, '<html xmlns="http://www.w3.org/1999/xhtml"><body><ul><li><a href="http://localhost:5000/foo?format=json">application/json</a></li><li><a href="http://localhost:5000/foo?format=xml">application/xml</a></li></ul></body></html>';
                 } else {
                     is $res->content, '';
                 }
@@ -205,7 +205,7 @@ foreach my $tolerant (@tolerant_values) {
                 is $res->code, 406;
                 is $res->content_type, 'application/xhtml+xml';
                 if($method eq 'GET') {
-                    is_xml $res->content, '<ul><li><a href="http://localhost:9000/bar?format=json">application/json</a></li><li><a href="http://localhost:9000/bar?format=xml">application/xml</a></li></ul>';
+                    is_xml $res->content, '<html xmlns="http://www.w3.org/1999/xhtml"><body><ul><li><a href="http://localhost:9000/bar?format=json">application/json</a></li><li><a href="http://localhost:9000/bar?format=xml">application/xml</a></li></ul></body></html>';
                 } else {
                     is $res->content, '';
                 }
@@ -228,7 +228,7 @@ foreach my $tolerant (@tolerant_values) {
                 is $res->code, 406;
                 is $res->content_type, 'application/xhtml+xml';
                 if($method eq 'GET') {
-                    is_xml $res->content, '<ul><li><a href="http://localhost:5000/foo?format=json">application/json</a></li><li><a href="http://localhost:5000/foo?format=xml">application/xml</a></li></ul>';
+                    is_xml $res->content, '<html xmlns="http://www.w3.org/1999/xhtml"><body><ul><li><a href="http://localhost:5000/foo?format=json">application/json</a></li><li><a href="http://localhost:5000/foo?format=xml">application/xml</a></li></ul></body></html>';
                 } else {
                     is $res->content, '';
                 }
@@ -243,7 +243,7 @@ foreach my $tolerant (@tolerant_values) {
                 is $res->code, 406;
                 is $res->content_type, 'application/xhtml+xml';
                 if($method eq 'GET') {
-                    is_xml $res->content, '<ul><li><a href="http://localhost:9000/bar?format=json">application/json</a></li><li><a href="http://localhost:9000/bar?format=xml">application/xml</a></li></ul>';
+                    is_xml $res->content, '<html xmlns="http://www.w3.org/1999/xhtml"><body><ul><li><a href="http://localhost:9000/bar?format=json">application/json</a></li><li><a href="http://localhost:9000/bar?format=xml">application/xml</a></li></ul></body></html>';
                 } else {
                     is $res->content, '';
                 }
@@ -353,7 +353,7 @@ foreach my $tolerant (@tolerant_values) {
                 is $res->code, 406;
                 is $res->content_type, 'application/xhtml+xml';
                 if($method eq 'GET') {
-                    is_xml $res->content, '<ul><li><a href="http://localhost:5000/foo.json">application/json</a></li><li><a href="http://localhost:5000/foo.xml">application/xml</a></li></ul>';
+                    is_xml $res->content, '<html xmlns="http://www.w3.org/1999/xhtml"><body><ul><li><a href="http://localhost:5000/foo.json">application/json</a></li><li><a href="http://localhost:5000/foo.xml">application/xml</a></li></ul></body></html>';
                 } else {
                     is $res->content, '';
                 }
@@ -368,7 +368,7 @@ foreach my $tolerant (@tolerant_values) {
                 is $res->code, 406;
                 is $res->content_type, 'application/xhtml+xml';
                 if($method eq 'GET') {
-                    is_xml $res->content, '<ul><li><a href="http://localhost:5000/foo?format=json">application/json</a></li><li><a href="http://localhost:5000/foo?format=xml">application/xml</a></li></ul>';
+                    is_xml $res->content, '<html xmlns="http://www.w3.org/1999/xhtml"><body><ul><li><a href="http://localhost:5000/foo?format=json">application/json</a></li><li><a href="http://localhost:5000/foo?format=xml">application/xml</a></li></ul></body></html>';
                 } else {
                     is $res->content, '';
                 }
@@ -383,7 +383,7 @@ foreach my $tolerant (@tolerant_values) {
                 is $res->code, 406;
                 is $res->content_type, 'application/xhtml+xml';
                 if($method eq 'GET') {
-                    is_xml $res->content, '<ul><li><a href="http://localhost:9000/bar.json">application/json</a></li><li><a href="http://localhost:9000/bar.xml">application/xml</a></li></ul>';
+                    is_xml $res->content, '<html xmlns="http://www.w3.org/1999/xhtml"><body><ul><li><a href="http://localhost:9000/bar.json">application/json</a></li><li><a href="http://localhost:9000/bar.xml">application/xml</a></li></ul></body></html>';
                 } else {
                     is $res->content, '';
                 }
@@ -398,7 +398,7 @@ foreach my $tolerant (@tolerant_values) {
                 is $res->code, 406;
                 is $res->content_type, 'application/xhtml+xml';
                 if($method eq 'GET') {
-                    is_xml $res->content, '<ul><li><a href="http://localhost:9000/bar?format=json">application/json</a></li><li><a href="http://localhost:9000/bar?format=xml">application/xml</a></li></ul>';
+                    is_xml $res->content, '<html xmlns="http://www.w3.org/1999/xhtml"><body><ul><li><a href="http://localhost:9000/bar?format=json">application/json</a></li><li><a href="http://localhost:9000/bar?format=xml">application/xml</a></li></ul></body></html>';
                 } else {
                     is $res->content, '';
                 }
@@ -421,7 +421,7 @@ foreach my $tolerant (@tolerant_values) {
                 is $res->code, 406;
                 is $res->content_type, 'application/xhtml+xml';
                 if($method eq 'GET') {
-                    is_xml $res->content, '<ul><li><a href="http://localhost:5000/foo.json">application/json</a></li><li><a href="http://localhost:5000/foo.xml">application/xml</a></li></ul>';
+                    is_xml $res->content, '<html xmlns="http://www.w3.org/1999/xhtml"><body><ul><li><a href="http://localhost:5000/foo.json">application/json</a></li><li><a href="http://localhost:5000/foo.xml">application/xml</a></li></ul></body></html>';
                 } else {
                     is $res->content, '';
                 }
@@ -436,7 +436,7 @@ foreach my $tolerant (@tolerant_values) {
                 is $res->code, 406;
                 is $res->content_type, 'application/xhtml+xml';
                 if($method eq 'GET') {
-                    is_xml $res->content, '<ul><li><a href="http://localhost:9000/bar.json">application/json</a></li><li><a href="http://localhost:9000/bar.xml">application/xml</a></li></ul>';
+                    is_xml $res->content, '<html xmlns="http://www.w3.org/1999/xhtml"><body><ul><li><a href="http://localhost:9000/bar.json">application/json</a></li><li><a href="http://localhost:9000/bar.xml">application/xml</a></li></ul></body></html>';
                 } else {
                     is $res->content, '';
                 }
@@ -494,7 +494,7 @@ foreach my $tolerant (@tolerant_values) {
                 is $res->code, 406;
                 is $res->content_type, 'application/xhtml+xml';
                 if($method eq 'GET') {
-                    is_xml $res->content, '<ul><li><a href="http://localhost:5000/foo.json">application/json</a></li><li><a href="http://localhost:5000/foo.xml">application/xml</a></li></ul>';
+                    is_xml $res->content, '<html xmlns="http://www.w3.org/1999/xhtml"><body><ul><li><a href="http://localhost:5000/foo.json">application/json</a></li><li><a href="http://localhost:5000/foo.xml">application/xml</a></li></ul></body></html>';
                 } else {
                     is $res->content, '';
                 }
@@ -509,7 +509,7 @@ foreach my $tolerant (@tolerant_values) {
                 is $res->code, 406;
                 is $res->content_type, 'application/xhtml+xml';
                 if($method eq 'GET') {
-                    is_xml $res->content, '<ul><li><a href="http://localhost:5000/foo?format=json">application/json</a></li><li><a href="http://localhost:5000/foo?format=xml">application/xml</a></li></ul>';
+                    is_xml $res->content, '<html xmlns="http://www.w3.org/1999/xhtml"><body><ul><li><a href="http://localhost:5000/foo?format=json">application/json</a></li><li><a href="http://localhost:5000/foo?format=xml">application/xml</a></li></ul></body></html>';
                 } else {
                     is $res->content, '';
                 }
@@ -524,7 +524,7 @@ foreach my $tolerant (@tolerant_values) {
                 is $res->code, 406;
                 is $res->content_type, 'application/xhtml+xml';
                 if($method eq 'GET') {
-                    is_xml $res->content, '<ul><li><a href="http://localhost:9000/bar.json">application/json</a></li><li><a href="http://localhost:9000/bar.xml">application/xml</a></li></ul>';
+                    is_xml $res->content, '<html xmlns="http://www.w3.org/1999/xhtml"><body><ul><li><a href="http://localhost:9000/bar.json">application/json</a></li><li><a href="http://localhost:9000/bar.xml">application/xml</a></li></ul></body></html>';
                 } else {
                     is $res->content, '';
                 }
@@ -539,7 +539,7 @@ foreach my $tolerant (@tolerant_values) {
                 is $res->code, 406;
                 is $res->content_type, 'application/xhtml+xml';
                 if($method eq 'GET') {
-                    is_xml $res->content, '<ul><li><a href="http://localhost:9000/bar?format=json">application/json</a></li><li><a href="http://localhost:9000/bar?format=xml">application/xml</a></li></ul>';
+                    is_xml $res->content, '<html xmlns="http://www.w3.org/1999/xhtml"><body><ul><li><a href="http://localhost:9000/bar?format=json">application/json</a></li><li><a href="http://localhost:9000/bar?format=xml">application/xml</a></li></ul></body></html>';
                 } else {
                     is $res->content, '';
                 }
@@ -562,7 +562,7 @@ foreach my $tolerant (@tolerant_values) {
                 is $res->code, 406;
                 is $res->content_type, 'application/xhtml+xml';
                 if($method eq 'GET') {
-                    is_xml $res->content, '<ul><li><a href="http://localhost:5000/foo?format=json">application/json</a></li><li><a href="http://localhost:5000/foo?format=xml">application/xml</a></li></ul>';
+                    is_xml $res->content, '<html xmlns="http://www.w3.org/1999/xhtml"><body><ul><li><a href="http://localhost:5000/foo?format=json">application/json</a></li><li><a href="http://localhost:5000/foo?format=xml">application/xml</a></li></ul></body></html>';
                 } else {
                     is $res->content, '';
                 }
@@ -577,7 +577,7 @@ foreach my $tolerant (@tolerant_values) {
                 is $res->code, 406;
                 is $res->content_type, 'application/xhtml+xml';
                 if($method eq 'GET') {
-                    is_xml $res->content, '<ul><li><a href="http://localhost:9000/bar?format=json">application/json</a></li><li><a href="http://localhost:9000/bar?format=xml">application/xml</a></li></ul>';
+                    is_xml $res->content, '<html xmlns="http://www.w3.org/1999/xhtml"><body><ul><li><a href="http://localhost:9000/bar?format=json">application/json</a></li><li><a href="http://localhost:9000/bar?format=xml">application/xml</a></li></ul></body></html>';
                 } else {
                     is $res->content, '';
                 }

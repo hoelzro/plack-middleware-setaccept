@@ -121,7 +121,7 @@ sub unacceptable {
     my $content;
 
     if($env->{'REQUEST_METHOD'} eq 'GET') {
-        $content = '<ul>';
+        $content = '<html xmlns="http://www.w3.org/1999/xhtml"><body><ul>';
 
         my $from;
 
@@ -145,7 +145,7 @@ sub unacceptable {
                 $content .= "<li><a href='http://$host$path?$param=$format'>$type</a></li>";
             }
         }
-        $content .= '</ul>';
+        $content .= '</ul></body></html>';
     }
     return [
         406,

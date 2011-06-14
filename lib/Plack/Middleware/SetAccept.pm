@@ -105,6 +105,10 @@ sub acceptable {
 sub unacceptable {
     my ( $self, $env, $reasons ) = @_;
 
+    if($self->{'tolerant'}) {
+        return $self->app->($env);
+    }
+
     my $host;
     unless($host = $env->{'HTTP_HOST'}) {
         $host = $env->{'SERVER_NAME'};

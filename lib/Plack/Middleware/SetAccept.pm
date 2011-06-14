@@ -230,18 +230,78 @@ __END__
 
   builder {
     enable 'SetAccept', from => 'suffix', mapping => \&mapper;
+    $app;
   };
 
   # or
 
   builder {
     enable 'SetAccept', from => 'param', param => 'format', mapping => \%map;
+    $app;
+  };
+
+  # or
+  
+  builder {
+    enable 'SetAccept', from => ['suffix', 'param'], param => 'format', mapping => \%map;
+    $app;
   };
 
 =head1 DESCRIPTION
 
-=head1 FUNCTIONS
+This middleware sets the Accept header by extracting a piece of the request
+URI.  It can extract from either the suffix of the path (ex. /foo.json) or
+from the query string (ex. /foo?format=json) for HEAD and GET requests.  The
+value is looked up in a mapping table and is added to the Accept header.
+
+=head1 PARAMETERS
+
+=head2 from
+
+Specifies from where the middleware is to extract the accept string.  Valid
+values for this are 'suffix', 'param', or an array reference containing
+either/both of those values.  The order in the array reference doesn't really
+matter, except for when the middleware generates XHTML links on a 406 error.
+
+=head2 param
+
+Only required when using 'param' for from.  Specifies the query string
+parameter that specifies the lookup value for the mapping table.
+
+=head2 mapping
+
+A hash table containing Accept mappings.  The keys should be the possible
+values extracted from the URI, and the values should be the mime types
+associated with the keys.
+
+=head2 tolerant
+
+If this option is falsy (defaults to 1), a 406 response code will be
+generated for "unacceptable" values.  The body of the response will
+contain an XHTML document with a list of alternative links.
 
 =head1 SEE ALSO
+
+L<Plack>, L<Plack::Middleware>
+
+=begin comment
+
+=over
+
+=item prepare_app
+
+=item get_uri
+
+=item extract_format
+
+=item acceptable
+
+=item unacceptable
+
+=item call
+
+=back
+
+=end comment
 
 =cut

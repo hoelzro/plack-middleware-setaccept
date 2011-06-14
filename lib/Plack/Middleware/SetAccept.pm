@@ -34,6 +34,9 @@ sub prepare_app {
             croak "'param' parameter is required when using 'param' for from";
         }
     }
+    unless(exists $self->{'tolerant'}) {
+        $self->{'tolerant'} = 1;
+    }
 
     unless(ref($mapping) eq 'HASH') {
         croak "'mapping' parameter must be a hash reference";

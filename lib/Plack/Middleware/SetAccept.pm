@@ -228,13 +228,7 @@ __END__
     enable 'SetAccept', from => 'suffix', mapping => \%map;
     $app;
   };
-
-  # or
-
-  builder {
-    enable 'SetAccept', from => 'suffix', mapping => \&mapper;
-    $app;
-  };
+  # now /foo.json behaves as /foo, with Accept: application/json
 
   # or
 
@@ -242,6 +236,7 @@ __END__
     enable 'SetAccept', from => 'param', param => 'format', mapping => \%map;
     $app;
   };
+  # now /foo?format=xml behaves as /foo, with Accept: application/xml
 
   # or
   
